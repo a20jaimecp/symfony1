@@ -1,0 +1,35 @@
+version: '3'  
+services:
+  nginx: 
+    image: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/symfony.conf:/etc/nginx/conf.d/symfony.conf
+      - ./symfony:/app/symfony
+      - ./app/server.key:/etc/ssl/private/server.key
+      - ./app/server.pem:/etc/ssl/certs/server.pem
+  app:
+    build: app
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app/entrypoint-nginx.sh:/entrypoint.sh
+      - ./symfony:/app/symfony
+      - ./app/www.conf:/etc/php/8.1/fpm/pool.d/www.conf
+
+  db: 
+    image: mysql
+    environment:
+      MYSQL_DATABASE: presta
+      MYSQL_USER: prestauser
+      MYSQL_PASSWORD: abc123.
+      MYSQL_ROOT_PASSWORD: abc123.
+    volumes: 
+      - basedatos:/var/lib/mysql
+      - ./db/db.sql:/docker-entrypoint-initdb.d/db.sql
+
+
+volumes: 
+  basedatos:
